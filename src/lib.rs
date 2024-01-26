@@ -55,9 +55,9 @@
 #[macro_export]
 macro_rules! horner {
     // ($x:expr; ) => (0); // `0` should be of the same type as `x`...
-    ($x:expr; [$($coeffs:expr),+ $(,)?]) => { horner!($x; $($coeffs),*) };
+    ($x:expr; [$($coeffs:expr),+ $(,)?]) => { $crate::horner!($x; $($coeffs),*) };
     ($x:expr; $a:expr $(,)?) => { $a };
-    ($x:expr; $a:expr, $($rest:expr),+ $(,)?) => { $a + $x * horner!($x; $($rest),+) };
+    ($x:expr; $a:expr, $($rest:expr),+ $(,)?) => { $a + $x * $crate::horner!($x; $($rest),+) };
 }
 
 #[cfg(test)]

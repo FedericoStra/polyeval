@@ -18,6 +18,10 @@ Types of changes:
 <!-- next-header -->
 ## [Unreleased]
 
+### Fixed
+
+- Recursive macro call, using `$crate::`.
+
 ## [0.1.0] - 2024-01-26
 
 ### Added
