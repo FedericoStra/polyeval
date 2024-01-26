@@ -1,5 +1,5 @@
 #[test]
-fn horner() {
+fn test_horner() {
     use polyeval::horner;
 
     let x = 7;

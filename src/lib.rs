@@ -63,7 +63,7 @@ macro_rules! horner {
 #[cfg(test)]
 mod tests {
     #[test]
-    fn horner() {
+    fn test_horner() {
         for x in 0..32 {
             assert_eq!(horner!(x; 1), 1);
             assert_eq!(horner!(x; 1,), 1);
