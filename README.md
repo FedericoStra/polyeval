@@ -1,6 +1,6 @@
 # polyeval
 
-> Evaluate polynomials using Horner's form.
+> Evaluate polynomials.
 
 [![crates.io](https://img.shields.io/crates/v/polyeval?logo=rust)](https://crates.io/crates/polyeval)
 [![docs.rs](https://img.shields.io/docsrs/polyeval?logo=docsdotrs)](https://docs.rs/polyeval)
