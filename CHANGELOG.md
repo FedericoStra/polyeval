@@ -18,6 +18,8 @@ Types of changes:
 <!-- next-header -->
 ## [Unreleased]
 
+- Macro `horner_fma!`.
+
 ## [0.1.1] - 2024-01-26
 
 ### Fixed

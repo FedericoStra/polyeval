@@ -14,3 +14,6 @@ edition = "2021"
 [package.metadata.docs.rs]
 rustdoc-args = ["--cfg", "docsrs"]
 all-features = true
+
+[dependencies]
+num-traits = "0.2.17"
