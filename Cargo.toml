@@ -1,0 +1,16 @@
+[package]
+name = "polyeval"
+version = "0.1.0"
+authors = ["Federico Stra <stra.federico@gmail.com>"]
+description = "Evaluate polynomials."
+license = "MIT" # https://spdx.org/licenses/
+repository = "https://github.com/FedericoStra/polyeval"
+categories = ["algorithms", "mathematics"] # https://crates.io/category_slugs
+keywords = []
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--cfg", "docsrs"]
+all-features = true
