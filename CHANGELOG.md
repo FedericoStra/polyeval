@@ -18,6 +18,10 @@ Types of changes:
 <!-- next-header -->
 ## [Unreleased]
 
+### Added
+
+- Functions `horner` and `horner_array`.
+
 ## [0.2.0] - 2024-01-29
 
 ### Added

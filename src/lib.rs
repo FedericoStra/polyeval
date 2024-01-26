@@ -11,6 +11,74 @@
 
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
+use num_traits::{MulAdd, Zero};
+use std::ops::{Add, Mul};
+
+#[inline]
+#[doc(hidden)]
+pub fn mul_add<T: MulAdd<Output = T>>(x: T, a: T, b: T) -> T {
+    x.mul_add(a, b)
+}
+
+/// Evaluate a polynomial with [Horner's method](https://en.wikipedia.org/wiki/Horner%27s_method).
+///
+/// The coefficients are listed from zeroth order to highest.
+///
+/// # Examples
+///
+/// ```
+/// use polyeval::horner;
+///
+/// let x = 7;
+///
+/// assert_eq!(horner(x, &[]), 0);
+/// assert_eq!(horner(x, &[0]), 0);
+///
+/// assert_eq!(
+///     horner(x, &[2, 3, 4]),
+///     2 + x * (3 + x * 4)
+/// );
+/// ```
+pub fn horner<T>(x: T, coeffs: &[T]) -> T
+where
+    T: Zero,
+    T: for<'a> Add<&'a T, Output = T>,
+    T: for<'a> Mul<&'a T, Output = T>,
+{
+    coeffs.iter().rfold(T::zero(), |acc: T, c: &T| acc * &x + c)
+}
+
+/// Evaluate a polynomial with [Horner's method](https://en.wikipedia.org/wiki/Horner%27s_method).
+///
+/// Same as [`horner`](fn@horner), but specialized for [arrays](primitive@array).
+/// At the moment this doesn't seem to provide better codegen, but it may change in the future.
+///
+/// Currently, the only benefit over [`horner`](fn@horner) is that it provides
+/// type-checked verification of the order of the polynomial.
+///
+/// # Examples
+///
+/// ```
+/// use polyeval::horner_array;
+///
+/// let x = 7;
+///
+/// assert_eq!(
+///     // if we so desire, we can type-check the order of the polynomial:
+///     //                v-- this is one plus the order of the polynomial
+///     horner_array::<_, 3>(x, &[2, 3, 4]),
+///     2 + x * (3 + x * 4)
+/// );
+/// ```
+pub fn horner_array<T, const N: usize>(x: T, coeffs: &[T; N]) -> T
+where
+    T: Zero + Copy,
+    T: for<'a> Add<&'a T, Output = T>,
+    T: for<'a> Mul<&'a T, Output = T>,
+{
+    coeffs.iter().rfold(T::zero(), |acc: T, c: &T| acc * &x + c)
+}
+
 /// Evaluate a polynomial with [Horner's method](https://en.wikipedia.org/wiki/Horner%27s_method).
 ///
 /// The coefficients are listed from zeroth order to highest.
@@ -71,12 +139,6 @@ macro_rules! horner_fma {
     ($x:expr; [$($coeffs:expr),+ $(,)?]) => { $crate::horner_fma!($x; $($coeffs),*) };
     ($x:expr; $a:expr $(,)?) => { $a };
     ($x:expr; $a:expr, $($rest:expr),+ $(,)?) => { $crate::mul_add($crate::horner_fma!($x; $($rest),+), $x, $a) };
-}
-
-#[inline]
-#[doc(hidden)]
-pub fn mul_add<T: num_traits::MulAdd<Output = T>>(x: T, a: T, b: T) -> T {
-    x.mul_add(a, b)
 }
 
 /// Evaluate a polynomial with [Estrin's scheme](https://en.wikipedia.org/wiki/Estrin%27s_scheme).
@@ -182,6 +244,60 @@ macro_rules! estrin_fma {
 mod tests {
     #[test]
     fn test_horner() {
+        use super::horner;
+        for x in 0..32 {
+            assert_eq!(horner(x, &[]), 0);
+            assert_eq!(horner(x, &[1]), 1);
+            assert_eq!(horner(x, &[1, 2]), 1 + 2 * x);
+            assert_eq!(
+                horner(x, &[1, 2, 3, 4, 5]),
+                1 + x * (2 + x * (3 + x * (4 + x * 5)))
+            );
+        }
+        for x in 0..32 {
+            let x = x as f32;
+            assert_eq!(horner(x, &[1.]), 1.);
+            assert_eq!(horner(x, &[1., 2.]), 1. + 2. * x);
+            assert_eq!(
+                horner(x, &[1., 2., 3., 4., 5.]),
+                1. + x * (2. + x * (3. + x * (4. + x * 5.)))
+            );
+        }
+    }
+
+    #[test]
+    fn test_horner_array() {
+        use super::horner_array;
+        for x in 0..32 {
+            assert_eq!(horner_array(x, &[]), 0);
+            assert_eq!(horner_array(x, &[1]), 1);
+            assert_eq!(horner_array(x, &[1, 2]), 1 + 2 * x);
+            assert_eq!(
+                horner_array(x, &[1, 2, 3, 4, 5]),
+                1 + x * (2 + x * (3 + x * (4 + x * 5)))
+            );
+        }
+        for x in 0..32 {
+            let x = x as f32;
+            assert_eq!(horner_array(x, &[1.]), 1.);
+            assert_eq!(horner_array(x, &[1., 2.]), 1. + 2. * x);
+            assert_eq!(
+                horner_array(x, &[1., 2., 3., 4., 5.]),
+                1. + x * (2. + x * (3. + x * (4. + x * 5.)))
+            );
+            assert_eq!(
+                horner_array::<_, 5>(x, &[1., 2., 3., 4., 5.]),
+                1. + x * (2. + x * (3. + x * (4. + x * 5.)))
+            );
+            assert_eq!(
+                horner_array::<f32, 5>(x, &[1., 2., 3., 4., 5.]),
+                1. + x * (2. + x * (3. + x * (4. + x * 5.)))
+            );
+        }
+    }
+
+    #[test]
+    fn test_macro_horner() {
         for x in 0..32 {
             assert_eq!(horner!(x; 1), 1);
             assert_eq!(horner!(x; 1,), 1);
@@ -206,7 +322,7 @@ mod tests {
     }
 
     #[test]
-    fn test_horner_fma() {
+    fn test_macro_horner_fma() {
         for x in 0..32 {
             assert_eq!(horner_fma!(x; 1), 1);
             assert_eq!(horner_fma!(x; 1,), 1);
@@ -231,7 +347,7 @@ mod tests {
     }
 
     #[test]
-    fn test_estrin() {
+    fn test_macro_estrin() {
         for x in 0..32 {
             assert_eq!(estrin!(x; 1), 1);
             assert_eq!(estrin!(x; 1,), 1);
@@ -256,7 +372,7 @@ mod tests {
     }
 
     #[test]
-    fn test_estrin_fma() {
+    fn test_macro_estrin_fma() {
         for x in 0..32 {
             assert_eq!(estrin_fma!(x; 1), 1);
             assert_eq!(estrin_fma!(x; 1,), 1);
