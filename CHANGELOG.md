@@ -18,6 +18,8 @@ Types of changes:
 <!-- next-header -->
 ## [Unreleased]
 
+## [0.1.2] - 2024-01-26
+
 - Macro `horner_fma!`.
 
 ## [0.1.1] - 2024-01-26
@@ -33,6 +35,7 @@ Types of changes:
 - Macro `horner!`.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/FedericoStra/polyeval/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/FedericoStra/polyeval/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/FedericoStra/polyeval/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/FedericoStra/polyeval/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/FedericoStra/polyeval/releases/tag/v0.1.0
