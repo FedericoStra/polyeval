@@ -18,6 +18,8 @@ Types of changes:
 <!-- next-header -->
 ## [Unreleased]
 
+## [0.1.1] - 2024-01-26
+
 ### Fixed
 
 - Recursive macro call, using `$crate::`.
@@ -29,5 +31,6 @@ Types of changes:
 - Macro `horner!`.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/FedericoStra/polyeval/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/FedericoStra/polyeval/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/FedericoStra/polyeval/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/FedericoStra/polyeval/releases/tag/v0.1.0
