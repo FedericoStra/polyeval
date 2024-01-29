@@ -9,6 +9,15 @@
 [![Dependencies status](https://deps.rs/repo/github/FedericoStra/polyeval/status.svg)](https://deps.rs/repo/github/FedericoStra/polyeval)
 [![MIT license](https://img.shields.io/crates/l/polyeval)](https://choosealicense.com/licenses/mit/)
 
+## Contents
+
+This crate provides four macros (`horner!`, `horner_fma!`, `estrin!`, and `estrin_fma!`) to evaluate
+a polynomial using either [Horner's method] or [Estrin's scheme].
+The `_fma` variants use "fused multiply-add" instructions where applicable.
+
+[Horner]: https://en.wikipedia.org/wiki/Horner%27s_method
+[Estrin]: https://en.wikipedia.org/wiki/Estrin%27s_scheme
+
 ## Other crates
 
 On <https://crates.io> there are several crates related to polynomial evaluation:

@@ -18,7 +18,14 @@ Types of changes:
 <!-- next-header -->
 ## [Unreleased]
 
+### Added
+
+- Macro `estrin!`.
+- Macro `estrin_fma!`.
+
 ## [0.1.2] - 2024-01-26
+
+### Added
 
 - Macro `horner_fma!`.
 
