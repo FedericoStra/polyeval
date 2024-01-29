@@ -79,6 +79,73 @@ pub fn mul_add<T: num_traits::MulAdd<Output = T>>(x: T, a: T, b: T) -> T {
     x.mul_add(a, b)
 }
 
+/// Evaluate a polynomial with [Estrin's scheme](https://en.wikipedia.org/wiki/Estrin%27s_scheme).
+///
+/// The coefficients are listed from zeroth order to highest.
+///
+/// At least one coefficient must be present;
+/// the coefficients may be enclosed in square brackets;
+/// a trailing comma is allowed at the end of the coefficients.
+///
+/// # Usage
+///
+/// The macro can be invoked in any of the following ways:
+/// - `estrin!(x; a₀, a₁, ..., aₙ)`,
+/// - `estrin!(x; a₀, a₁, ..., aₙ,)`,
+/// - `estrin!(x; [a₀, a₁, ..., aₙ])`,
+/// - `estrin!(x; [a₀, a₁, ..., aₙ,])`.
+///
+/// In every case it computes the polynomial `aₙxⁿ + ... + a₁x + a₀` using Estrin's scheme.
+///
+/// # Examples
+///
+/// ```
+/// use polyeval::estrin;
+///
+/// let x = 7;
+///
+/// assert_eq!(estrin!(x; [0]), 0);
+/// assert_eq!(estrin!(x; [0,]), 0);
+/// assert_eq!(estrin!(x; 0), 0);
+/// assert_eq!(estrin!(x; 0,), 0);
+///
+/// assert_eq!(
+///     estrin!(x; 2, 3, 4),
+///     2 + x * (3 + x * 4)
+/// );
+///
+/// assert_eq!(
+///     estrin!(x; [2, 3, 4]),
+///     2 + x * (3 + x * 4)
+/// );
+/// ```
+#[macro_export]
+macro_rules! estrin {
+    // ($x:expr; ) => (0); // `0` should be of the same type as `x`... Maybe return `x-x`?
+    ($x:expr; [$($coeffs:expr),* $(,)?]) => { $crate::estrin!($x; $($coeffs),*) };
+    ($x:expr; $a:expr $(,)?) => { $a };
+    ($x:expr; $a0:expr, $a1:expr $(,)?) => { $a0 + $x * $a1 };
+    ($x:expr; $($coeffs:expr),+ $(,)?) => { $crate::estrin!($x; $($coeffs),+; ) };
+
+    // one coefficient left
+    ($x:expr; $a0:expr; $($out:expr),+) => {{
+        let x2 = $x*$x;
+        $crate::estrin!(x2; $($out),+, $a0)
+    }};
+    // two coefficients left
+    ($x:expr; $a0:expr, $a1:expr; $($out:expr),+) => {{
+        let x2 = $x*$x;
+        $crate::estrin!(x2; $($out),+, $a0 + $x * $a1)
+    }};
+    // more coefficients left
+    ($x:expr; $a0:expr, $a1:expr, $($rest:expr),+; ) => {
+        $crate::estrin!($x; $($rest),+; $a0 + $x * $a1)
+    };
+    ($x:expr; $a0:expr, $a1:expr, $($rest:expr),+; $($out:expr),+) => {
+        $crate::estrin!($x; $($rest),+; $($out),+, $a0 + $x * $a1)
+    };
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
@@ -126,6 +193,31 @@ mod tests {
             assert_eq!(horner_fma!(x; 1., 2.,), 1. + 2. * x);
             assert_eq!(
                 horner_fma!(x; 1., 2., 3., 4., 5.),
+                1. + x * (2. + x * (3. + x * (4. + x * 5.)))
+            );
+        }
+    }
+
+    #[test]
+    fn test_estrin() {
+        for x in 0..32 {
+            assert_eq!(estrin!(x; 1), 1);
+            assert_eq!(estrin!(x; 1,), 1);
+            assert_eq!(estrin!(x; 1, 2), 1 + 2 * x);
+            assert_eq!(estrin!(x; 1, 2,), 1 + 2 * x);
+            assert_eq!(
+                estrin!(x; 1, 2, 3, 4, 5),
+                1 + x * (2 + x * (3 + x * (4 + x * 5)))
+            );
+        }
+        for x in 0..32 {
+            let x = x as f32;
+            assert_eq!(estrin!(x; 1.), 1.);
+            assert_eq!(estrin!(x; 1.,), 1.);
+            assert_eq!(estrin!(x; 1., 2.), 1. + 2. * x);
+            assert_eq!(estrin!(x; 1., 2.,), 1. + 2. * x);
+            assert_eq!(
+                estrin!(x; 1., 2., 3., 4., 5.),
                 1. + x * (2. + x * (3. + x * (4. + x * 5.)))
             );
         }
