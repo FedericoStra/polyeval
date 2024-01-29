@@ -20,6 +20,10 @@ Types of changes:
 
 ## [0.3.1] - 2024-01-29
 
+### Changed
+
+- Removed unnecessary `Copy` trait bound in `horner_array`.
+
 ## [0.3.0] - 2024-01-29
 
 ### Added
