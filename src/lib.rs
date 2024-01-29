@@ -79,7 +79,7 @@ where
 /// ```
 pub fn horner_array<T, const N: usize>(x: T, coeffs: &[T; N]) -> T
 where
-    T: Zero + Copy,
+    T: Zero,
     T: for<'a> Add<&'a T, Output = T>,
     T: for<'a> Mul<&'a T, Output = T>,
 {
