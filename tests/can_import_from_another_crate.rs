@@ -51,3 +51,21 @@ fn test_estrin() {
     assert_eq!(estrin!(x; [2, 3, 4]), 2 + x * (3 + x * 4));
     assert_eq!(estrin!(x; [2, 3, 4,]), 2 + x * (3 + x * 4));
 }
+
+#[test]
+fn test_estrin_fma() {
+    use polyeval::estrin_fma;
+
+    let x = 7;
+
+    assert_eq!(estrin_fma!(x; [0]), 0);
+    assert_eq!(estrin_fma!(x; [0,]), 0);
+    assert_eq!(estrin_fma!(x; 0), 0);
+    assert_eq!(estrin_fma!(x; 0,), 0);
+
+    assert_eq!(estrin_fma!(x; 2, 3, 4), 2 + x * (3 + x * 4));
+    assert_eq!(estrin_fma!(x; 2, 3, 4,), 2 + x * (3 + x * 4));
+
+    assert_eq!(estrin_fma!(x; [2, 3, 4]), 2 + x * (3 + x * 4));
+    assert_eq!(estrin_fma!(x; [2, 3, 4,]), 2 + x * (3 + x * 4));
+}

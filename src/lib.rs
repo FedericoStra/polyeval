@@ -146,6 +146,38 @@ macro_rules! estrin {
     };
 }
 
+/// Evaluate a polynomial with [Estrin's scheme](https://en.wikipedia.org/wiki/Estrin%27s_scheme).
+///
+/// Same as [`estrin!`], but uses "fused multiply-add" instructions.
+///
+/// The coefficients and the point of evaluation must be of a type which implements [`num_traits::MulAdd`].
+#[macro_export]
+macro_rules! estrin_fma {
+    // ($x:expr; ) => (0); // `0` should be of the same type as `x`... Maybe return `x-x`?
+    ($x:expr; [$($coeffs:expr),* $(,)?]) => { $crate::estrin!($x; $($coeffs),*) };
+    ($x:expr; $a:expr $(,)?) => { $a };
+    ($x:expr; $a0:expr, $a1:expr $(,)?) => { $crate::mul_add($x, $a1, $a0) };
+    ($x:expr; $($coeffs:expr),+ $(,)?) => { $crate::estrin!($x; $($coeffs),+; ) };
+
+    // one coefficient left
+    ($x:expr; $a0:expr; $($out:expr),+) => {{
+        let x2 = $x*$x;
+        $crate::estrin!(x2; $($out),+, $a0)
+    }};
+    // two coefficients left
+    ($x:expr; $a0:expr, $a1:expr; $($out:expr),+) => {{
+        let x2 = $x*$x;
+        $crate::estrin!(x2; $($out),+, $crate::mul_add($x, $a1, $a0))
+    }};
+    // more coefficients left
+    ($x:expr; $a0:expr, $a1:expr, $($rest:expr),+; ) => {
+        $crate::estrin!($x; $($rest),+; $crate::mul_add($x, $a1, $a0))
+    };
+    ($x:expr; $a0:expr, $a1:expr, $($rest:expr),+; $($out:expr),+) => {
+        $crate::estrin!($x; $($rest),+; $($out),+, $crate::mul_add($x, $a1, $a0))
+    };
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
@@ -218,6 +250,31 @@ mod tests {
             assert_eq!(estrin!(x; 1., 2.,), 1. + 2. * x);
             assert_eq!(
                 estrin!(x; 1., 2., 3., 4., 5.),
+                1. + x * (2. + x * (3. + x * (4. + x * 5.)))
+            );
+        }
+    }
+
+    #[test]
+    fn test_estrin_fma() {
+        for x in 0..32 {
+            assert_eq!(estrin_fma!(x; 1), 1);
+            assert_eq!(estrin_fma!(x; 1,), 1);
+            assert_eq!(estrin_fma!(x; 1, 2), 1 + 2 * x);
+            assert_eq!(estrin_fma!(x; 1, 2,), 1 + 2 * x);
+            assert_eq!(
+                estrin_fma!(x; 1, 2, 3, 4, 5),
+                1 + x * (2 + x * (3 + x * (4 + x * 5)))
+            );
+        }
+        for x in 0..32 {
+            let x = x as f32;
+            assert_eq!(estrin_fma!(x; 1.), 1.);
+            assert_eq!(estrin_fma!(x; 1.,), 1.);
+            assert_eq!(estrin_fma!(x; 1., 2.), 1. + 2. * x);
+            assert_eq!(estrin_fma!(x; 1., 2.,), 1. + 2. * x);
+            assert_eq!(
+                estrin_fma!(x; 1., 2., 3., 4., 5.),
                 1. + x * (2. + x * (3. + x * (4. + x * 5.)))
             );
         }
