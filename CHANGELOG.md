@@ -18,6 +18,14 @@ Types of changes:
 <!-- next-header -->
 ## [Unreleased]
 
+### Added
+
+- Features `num` and `limb`, forwarded to `num-traits`.
+
+### Changed
+
+- The crate can now be `no-std`.
+
 ## [0.3.1] - 2024-01-29
 
 ### Changed

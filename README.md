@@ -17,6 +17,8 @@ The `_fma` variants use "fused multiply-add" instructions where applicable.
 
 It provide also two functions (`horner` and `horner_array`) that work with slices and arrays respectively.
 
+The crate can be `no-std`; the features `std` (enabled by default) and `libm` are passed through to `num-traits`.
+
 [Horner]: https://en.wikipedia.org/wiki/Horner%27s_method
 [Estrin]: https://en.wikipedia.org/wiki/Estrin%27s_scheme
 

@@ -16,10 +16,11 @@
 //!
 //! # Examples
 
+#![cfg_attr(not(any(feature = "std", test)), no_std)]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
+use core::ops::{Add, Mul};
 use num_traits::{MulAdd, Zero};
-use std::ops::{Add, Mul};
 
 #[inline]
 #[doc(hidden)]
