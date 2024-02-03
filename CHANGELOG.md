@@ -18,6 +18,8 @@ Types of changes:
 <!-- next-header -->
 ## [Unreleased]
 
+## [0.4.1] - 2024-02-03
+
 ### Fixed
 
 - Recursive call in macro `estrin_fma!`.
@@ -70,7 +72,8 @@ Types of changes:
 - Macro `horner!`.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/FedericoStra/polyeval/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/FedericoStra/polyeval/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/FedericoStra/polyeval/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/FedericoStra/polyeval/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/FedericoStra/polyeval/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/FedericoStra/polyeval/compare/v0.2.0...v0.3.0
