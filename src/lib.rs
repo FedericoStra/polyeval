@@ -224,27 +224,27 @@ macro_rules! estrin {
 #[macro_export]
 macro_rules! estrin_fma {
     // ($x:expr; ) => (0); // `0` should be of the same type as `x`... Maybe return `x-x`?
-    ($x:expr; [$($coeffs:expr),* $(,)?]) => { $crate::estrin!($x; $($coeffs),*) };
+    ($x:expr; [$($coeffs:expr),* $(,)?]) => { $crate::estrin_fma!($x; $($coeffs),*) };
     ($x:expr; $a:expr $(,)?) => { $a };
     ($x:expr; $a0:expr, $a1:expr $(,)?) => { $crate::mul_add($x, $a1, $a0) };
-    ($x:expr; $($coeffs:expr),+ $(,)?) => { $crate::estrin!($x; $($coeffs),+; ) };
+    ($x:expr; $($coeffs:expr),+ $(,)?) => { $crate::estrin_fma!($x; $($coeffs),+; ) };
 
     // one coefficient left
     ($x:expr; $a0:expr; $($out:expr),+) => {{
         let x2 = $x*$x;
-        $crate::estrin!(x2; $($out),+, $a0)
+        $crate::estrin_fma!(x2; $($out),+, $a0)
     }};
     // two coefficients left
     ($x:expr; $a0:expr, $a1:expr; $($out:expr),+) => {{
         let x2 = $x*$x;
-        $crate::estrin!(x2; $($out),+, $crate::mul_add($x, $a1, $a0))
+        $crate::estrin_fma!(x2; $($out),+, $crate::mul_add($x, $a1, $a0))
     }};
     // more coefficients left
     ($x:expr; $a0:expr, $a1:expr, $($rest:expr),+; ) => {
-        $crate::estrin!($x; $($rest),+; $crate::mul_add($x, $a1, $a0))
+        $crate::estrin_fma!($x; $($rest),+; $crate::mul_add($x, $a1, $a0))
     };
     ($x:expr; $a0:expr, $a1:expr, $($rest:expr),+; $($out:expr),+) => {
-        $crate::estrin!($x; $($rest),+; $($out),+, $crate::mul_add($x, $a1, $a0))
+        $crate::estrin_fma!($x; $($rest),+; $($out),+, $crate::mul_add($x, $a1, $a0))
     };
 }
 

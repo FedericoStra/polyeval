@@ -18,6 +18,10 @@ Types of changes:
 <!-- next-header -->
 ## [Unreleased]
 
+### Fixed
+
+- Recursive call in macro `estrin_fma!`.
+
 ## [0.4.0] - 2024-01-29
 
 ### Added
