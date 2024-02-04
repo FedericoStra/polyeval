@@ -20,6 +20,10 @@ Types of changes:
 
 ## [0.4.1] - 2024-02-03
 
+### Added
+
+- Allow `let` keyword in `horner!`, `horner_fma!`, `estrin!`, and `estrin_fma!` macros to evaluate the argument only once.
+
 ## [0.4.1] - 2024-02-03
 
 ### Fixed

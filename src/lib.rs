@@ -95,13 +95,19 @@ where
 /// the coefficients may be enclosed in square brackets;
 /// a trailing comma is allowed at the end of the coefficients.
 ///
+/// If the first token is the keyword `let`, then the `x` argument is evaluated only once.
+///
 /// # Usage
 ///
 /// The macro can be invoked in any of the following ways:
 /// - `horner!(x; a₀, a₁, ..., aₙ)`,
 /// - `horner!(x; a₀, a₁, ..., aₙ,)`,
 /// - `horner!(x; [a₀, a₁, ..., aₙ])`,
-/// - `horner!(x; [a₀, a₁, ..., aₙ,])`.
+/// - `horner!(x; [a₀, a₁, ..., aₙ,])`,
+/// - `horner!(let x; a₀, a₁, ..., aₙ)`,
+/// - `horner!(let x; a₀, a₁, ..., aₙ,)`,
+/// - `horner!(let x; [a₀, a₁, ..., aₙ])`,
+/// - `horner!(let x; [a₀, a₁, ..., aₙ,])`.
 ///
 /// In every case it computes the polynomial `aₙxⁿ + ... + a₁x + a₀` using Horner's method, i.e.
 /// `a₀ + x*(a₁ + x*( ... + x*aₙ...))`.
@@ -134,6 +140,10 @@ macro_rules! horner {
     ($x:expr; [$($coeffs:expr),+ $(,)?]) => { $crate::horner!($x; $($coeffs),*) };
     ($x:expr; $a:expr $(,)?) => { $a };
     ($x:expr; $a:expr, $($rest:expr),+ $(,)?) => { $a + $x * $crate::horner!($x; $($rest),+) };
+    (let $x:expr; $($t:tt)*) => {{
+        let x = $x;
+        $crate::horner!(x; $($t)*)
+    }};
 }
 
 /// Evaluate a polynomial with [Horner's method](https://en.wikipedia.org/wiki/Horner%27s_method).
@@ -147,6 +157,10 @@ macro_rules! horner_fma {
     ($x:expr; [$($coeffs:expr),+ $(,)?]) => { $crate::horner_fma!($x; $($coeffs),*) };
     ($x:expr; $a:expr $(,)?) => { $a };
     ($x:expr; $a:expr, $($rest:expr),+ $(,)?) => { $crate::mul_add($crate::horner_fma!($x; $($rest),+), $x, $a) };
+    (let $x:expr; $($t:tt)*) => {{
+        let x = $x;
+        $crate::horner_fma!(x; $($t)*)
+    }};
 }
 
 /// Evaluate a polynomial with [Estrin's scheme](https://en.wikipedia.org/wiki/Estrin%27s_scheme).
@@ -157,13 +171,19 @@ macro_rules! horner_fma {
 /// the coefficients may be enclosed in square brackets;
 /// a trailing comma is allowed at the end of the coefficients.
 ///
+/// If the first token is the keyword `let`, then the `x` argument is evaluated only once.
+///
 /// # Usage
 ///
 /// The macro can be invoked in any of the following ways:
 /// - `estrin!(x; a₀, a₁, ..., aₙ)`,
 /// - `estrin!(x; a₀, a₁, ..., aₙ,)`,
 /// - `estrin!(x; [a₀, a₁, ..., aₙ])`,
-/// - `estrin!(x; [a₀, a₁, ..., aₙ,])`.
+/// - `estrin!(x; [a₀, a₁, ..., aₙ,])`,
+/// - `estrin!(let x; a₀, a₁, ..., aₙ)`,
+/// - `estrin!(let x; a₀, a₁, ..., aₙ,)`,
+/// - `estrin!(let x; [a₀, a₁, ..., aₙ])`,
+/// - `estrin!(let x; [a₀, a₁, ..., aₙ,])`.
 ///
 /// In every case it computes the polynomial `aₙxⁿ + ... + a₁x + a₀` using Estrin's scheme.
 ///
@@ -196,16 +216,20 @@ macro_rules! estrin {
     ($x:expr; $a:expr $(,)?) => { $a };
     ($x:expr; $a0:expr, $a1:expr $(,)?) => { $a0 + $x * $a1 };
     ($x:expr; $($coeffs:expr),+ $(,)?) => { $crate::estrin!($x; $($coeffs),+; ) };
+    (let $x:expr; $($t:tt)*) => {{
+        let x = $x;
+        $crate::estrin!(x; $($t)*)
+    }};
 
     // one coefficient left
     ($x:expr; $a0:expr; $($out:expr),+) => {{
-        let x2 = $x*$x;
-        $crate::estrin!(x2; $($out),+, $a0)
+        let x = $x*$x;
+        $crate::estrin!(x; $($out),+, $a0)
     }};
     // two coefficients left
     ($x:expr; $a0:expr, $a1:expr; $($out:expr),+) => {{
-        let x2 = $x*$x;
-        $crate::estrin!(x2; $($out),+, $a0 + $x * $a1)
+        let x = $x*$x;
+        $crate::estrin!(x; $($out),+, $a0 + $x * $a1)
     }};
     // more coefficients left
     ($x:expr; $a0:expr, $a1:expr, $($rest:expr),+; ) => {
@@ -228,16 +252,20 @@ macro_rules! estrin_fma {
     ($x:expr; $a:expr $(,)?) => { $a };
     ($x:expr; $a0:expr, $a1:expr $(,)?) => { $crate::mul_add($x, $a1, $a0) };
     ($x:expr; $($coeffs:expr),+ $(,)?) => { $crate::estrin_fma!($x; $($coeffs),+; ) };
+    (let $x:expr; $($t:tt)*) => {{
+        let x = $x;
+        $crate::estrin_fma!(x; $($t)*)
+    }};
 
     // one coefficient left
     ($x:expr; $a0:expr; $($out:expr),+) => {{
-        let x2 = $x*$x;
-        $crate::estrin_fma!(x2; $($out),+, $a0)
+        let x = $x*$x;
+        $crate::estrin_fma!(x; $($out),+, $a0)
     }};
     // two coefficients left
     ($x:expr; $a0:expr, $a1:expr; $($out:expr),+) => {{
-        let x2 = $x*$x;
-        $crate::estrin_fma!(x2; $($out),+, $crate::mul_add($x, $a1, $a0))
+        let x = $x*$x;
+        $crate::estrin_fma!(x; $($out),+, $crate::mul_add($x, $a1, $a0))
     }};
     // more coefficients left
     ($x:expr; $a0:expr, $a1:expr, $($rest:expr),+; ) => {
@@ -402,5 +430,77 @@ mod tests {
                 1. + x * (2. + x * (3. + x * (4. + x * 5.)))
             );
         }
+    }
+
+    fn make_callable_only_once() -> impl FnMut() -> i32 {
+        let mut called = false;
+        move || {
+            if !called {
+                called = true;
+                1
+            } else {
+                panic!("function called more than once")
+            }
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "function called more than once")]
+    fn test_macro_horner_cannot_call_more_than_once() {
+        let mut f = make_callable_only_once();
+        assert_eq!(horner!(f(); 1, 2, 3), 6);
+    }
+
+    #[test]
+    fn test_macro_horner_can_call_more_than_once() {
+        let mut f = make_callable_only_once();
+        assert_eq!(horner!(let f(); 1, 2, 3), 6);
+        let mut f = make_callable_only_once();
+        assert_eq!(horner!(let f(); [1, 2, 3]), 6);
+    }
+
+    #[test]
+    #[should_panic(expected = "function called more than once")]
+    fn test_macro_horner_fma_cannot_call_more_than_once() {
+        let mut f = make_callable_only_once();
+        assert_eq!(horner_fma!(f(); 1, 2, 3), 6);
+    }
+
+    #[test]
+    fn test_macro_horner_fma_can_call_more_than_once() {
+        let mut f = make_callable_only_once();
+        assert_eq!(horner_fma!(let f(); 1, 2, 3), 6);
+        let mut f = make_callable_only_once();
+        assert_eq!(horner_fma!(let f(); [1, 2, 3]), 6);
+    }
+
+    #[test]
+    #[should_panic(expected = "function called more than once")]
+    fn test_macro_estrin_cannot_call_more_than_once() {
+        let mut f = make_callable_only_once();
+        assert_eq!(estrin!(f(); 1, 2, 3), 6);
+    }
+
+    #[test]
+    fn test_macro_estrin_can_call_more_than_once() {
+        let mut f = make_callable_only_once();
+        assert_eq!(estrin!(let f(); 1, 2, 3), 6);
+        let mut f = make_callable_only_once();
+        assert_eq!(estrin!(let f(); [1, 2, 3]), 6);
+    }
+
+    #[test]
+    #[should_panic(expected = "function called more than once")]
+    fn test_macro_estrin_fma_cannot_call_more_than_once() {
+        let mut f = make_callable_only_once();
+        assert_eq!(estrin_fma!(f(); 1, 2, 3), 6);
+    }
+
+    #[test]
+    fn test_macro_estrin_fma_can_call_more_than_once() {
+        let mut f = make_callable_only_once();
+        assert_eq!(estrin_fma!(let f(); 1, 2, 3), 6);
+        let mut f = make_callable_only_once();
+        assert_eq!(estrin_fma!(let f(); [1, 2, 3]), 6);
     }
 }
