@@ -18,9 +18,11 @@ Types of changes:
 <!-- next-header -->
 ## [Unreleased]
 
-## [0.4.2] - 2024-02-04
+### Fixed
 
-## [0.4.1] - 2024-02-03
+- Skip testing `_fma` functions when `std` or `libm` features are absent.
+
+## [0.4.2] - 2024-02-04
 
 ### Added
 

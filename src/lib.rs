@@ -357,6 +357,7 @@ mod tests {
         }
     }
 
+    #[cfg(any(feature = "std", feature = "lib"))]
     #[test]
     fn test_macro_horner_fma() {
         for x in 0..32 {
@@ -407,6 +408,7 @@ mod tests {
         }
     }
 
+    #[cfg(any(feature = "std", feature = "lib"))]
     #[test]
     fn test_macro_estrin_fma() {
         for x in 0..32 {
@@ -459,6 +461,7 @@ mod tests {
         assert_eq!(horner!(let f(); [1, 2, 3]), 6);
     }
 
+    #[cfg(any(feature = "std", feature = "lib"))]
     #[test]
     #[should_panic(expected = "function called more than once")]
     fn test_macro_horner_fma_cannot_call_more_than_once() {
@@ -466,6 +469,7 @@ mod tests {
         assert_eq!(horner_fma!(f(); 1, 2, 3), 6);
     }
 
+    #[cfg(any(feature = "std", feature = "lib"))]
     #[test]
     fn test_macro_horner_fma_can_call_more_than_once() {
         let mut f = make_callable_only_once();
@@ -489,6 +493,7 @@ mod tests {
         assert_eq!(estrin!(let f(); [1, 2, 3]), 6);
     }
 
+    #[cfg(any(feature = "std", feature = "lib"))]
     #[test]
     #[should_panic(expected = "function called more than once")]
     fn test_macro_estrin_fma_cannot_call_more_than_once() {
@@ -496,6 +501,7 @@ mod tests {
         assert_eq!(estrin_fma!(f(); 1, 2, 3), 6);
     }
 
+    #[cfg(any(feature = "std", feature = "lib"))]
     #[test]
     fn test_macro_estrin_fma_can_call_more_than_once() {
         let mut f = make_callable_only_once();
