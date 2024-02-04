@@ -18,6 +18,8 @@ Types of changes:
 <!-- next-header -->
 ## [Unreleased]
 
+## [0.4.3] - 2024-02-04
+
 ### Fixed
 
 - Skip testing `_fma` functions when `std` or `libm` features are absent.
@@ -82,7 +84,8 @@ Types of changes:
 - Macro `horner!`.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/FedericoStra/polyeval/compare/v0.4.2...HEAD
+[Unreleased]: https://github.com/FedericoStra/polyeval/compare/v0.4.3...HEAD
+[0.4.3]: https://github.com/FedericoStra/polyeval/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/FedericoStra/polyeval/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/FedericoStra/polyeval/compare/v0.4.1...v0.4.1
 [0.4.1]: https://github.com/FedericoStra/polyeval/compare/v0.4.0...v0.4.1
